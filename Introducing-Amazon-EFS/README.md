@@ -48,7 +48,7 @@ I created a dedicated security group to control NFS access to the EFS mount targ
 ### Actions Taken:
 
 1. **Navigated to Security Groups**: Used the EC2 service to access Security Groups
-2. **Identified Source Group**: Located and copied the EFSClient security group ID (`sg-03727965651b6659b`)
+2. **Identified Source Group**: Located and copied the EFSClient security group ID (`sg-08aca546ffeda9a67`)
 3. **Created New Security Group** with the following configuration:
    - **Name**: EFS Mount Target
    - **Description**: Inbound NFS access from EFS clients
@@ -316,8 +316,5 @@ I successfully completed all aspects of the Amazon EFS lab:
 - CloudWatch metrics analysis and interpretation
 - Performance calculation and optimization
 
-### Next Steps for Portfolio
-
-1. Add screenshots to `images/` folder as evidence of completion
-2. Document any custom optimizations or findings
-3. Create similar reports for other AWS lab exercises
+### Total Score
+![Lab Score](./images/lab-score.png)

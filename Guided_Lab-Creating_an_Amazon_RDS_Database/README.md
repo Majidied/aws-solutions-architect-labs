@@ -48,7 +48,6 @@ I accessed the lab environment through the AWS Management Console by:
 - **VPC**: Lab VPC (pre-configured)
 - **Pre-deployed Components**: EC2 instance with web application ready for database connectivity
 - **Estimated Remaining Time**: 20 minutes per lab specifications
-
 ---
 
 ## Task 1: Creating the Amazon RDS Database
@@ -62,6 +61,9 @@ I created the MySQL RDS database through the AWS Management Console with the fol
 - **Template**: Free tier (eligible for 12-month AWS free tier benefits)
 - **Availability Configuration**: Single-AZ DB instance (appropriate for lab environment)
 
+![RDS Engine Selection - MySQL](images/03-rds-engine-selection-mysql.png)
+*Selecting MySQL as the database engine with free tier template*
+
 #### Database Instance Settings
 | Parameter | Value | Rationale |
 |-----------|-------|-----------|
@@ -73,11 +75,24 @@ I created the MySQL RDS database through the AWS Management Console with the fol
 | Allocated Storage | 20 GB | Sufficient for lab requirements |
 | Storage Autoscaling | Disabled | Manual control preferred for lab environment |
 
+![RDS Settings Configuration](images/04-rds-settings-instance-class.png)
+*Configuring database instance identifier, credentials, and instance class (db.t3.micro)*
+![RDS Settings Configuration](images/02-rds-instance-class.png)
+*Configuring database instance class (db.t3.micro)*
+![RDS Storage Configuration](images/05-rds-storage-configuration.png)
+*Setting storage type (gp2) and allocated storage (20 GB) with autoscaling disabled*
+
 #### Networking & Security Configuration
 - **VPC**: Lab VPC (pre-configured with public and private subnets)
 - **DB Subnet Group**: Default (automatically configured with private subnets in two AZs)
 - **Security Group**: DB-SG (pre-configured security group allowing access from application tier)
 - **Removed**: Default security group to enforce principle of least privilege
+
+![RDS Connectivity Configuration](images/06-rds-connectivity-vpc-subnet-group.png)
+*Configuring VPC and DB subnet group in private subnets across availability zones*
+
+![RDS Security Group Configuration](images/07-rds-security-group-db-sg.png)
+*Selecting DB-SG security group and removing default security group for least privilege access*
 
 #### Additional Configuration
 - **Initial Database Name**: inventory (created as default database)
@@ -96,6 +111,12 @@ Result: ✅ Database available and ready for connection
 ```
 
 **Database Status Verification**: After submission, I monitored the RDS console and confirmed the database reached "Available" status, with the endpoint populated and ready for application integration.
+
+![RDS Database Creation Submitted](images/09-rds-create-database-button.png)
+*RDS database creation submitted and provisioning initiated*
+
+![RDS Database Available Status](images/10-rds-database-available-status.png)
+*Database instance "inventory-db" successfully created and in Available status*
 
 ---
 
@@ -121,12 +142,18 @@ I accessed the web application settings and entered the following connection par
 | Username | admin | RDS master username |
 | Password | lab-password | RDS master password |
 
+![Web Application Settings Form](images/13-web-app-settings-form.png)
+*Web application Settings page with RDS connection parameters form*
+
 #### Step 3: Validate Connection
 Upon clicking "Save," the application:
 1. Stored credentials in **AWS Secrets Manager** (not in source code)
 2. Established initial connection to the database
 3. Created and populated initial schema with sample data
 4. Displayed instance information and database connection status
+
+![Database Configuration Input](images/14-web-app-database-endpoint-entry.png)
+*Application successfully connected to RDS database and displaying connection status*
 
 ### Why This Configuration Matters
 
@@ -136,6 +163,12 @@ Upon clicking "Save," the application:
 - Provides centralized credential management and audit logging
 - Follows AWS Well-Architected Framework security pillar
 
+![AWS Secrets Manager Storage](images/17-aws-secrets-manager-database-secret.png)
+*AWS Secrets Manager storing encrypted database credentials*
+
+![Secrets Manager Secret Details](images/18-secrets-manager-secret-value.png)
+*Database credentials securely stored in Secrets Manager instead of application source code*
+
 ---
 
 ## Implementation Details
@@ -144,24 +177,24 @@ Upon clicking "Save," the application:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                        Application Tier                      │
+│                        Application Tier                     │
 │  ┌────────────────────────────────────────────────────────┐ │
 │  │         EC2 Instance (Web Application)                 │ │
-│  │  - Public IP for user access                          │ │
-│  │  - Retrieves credentials from Secrets Manager         │ │
-│  └────────────┬─────────────────────────────────────────┘ │
-└───────────────┼──────────────────────────────────────────────┘
+│  │  - Public IP for user access                           │ │
+│  │  - Retrieves credentials from Secrets Manager          │ │
+│  └────────────┬───────────────────────────────────────────┘ │
+└───────────────┼─────────────────────────────────────────────┘
                 │ (Application Tier Security Group)
                 │ Port 3306 (MySQL)
 ┌───────────────▼──────────────────────────────────────────────┐
-│                   Data Tier (Private Subnets)                 │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │     RDS MySQL Database Instance (inventory-db)         │ │
-│  │  - Private subnets across 2 Availability Zones        │ │
-│  │  - Multi-AZ capable configuration                     │ │
-│  │  - Managed backups and maintenance                    │ │
-│  └────────────────────────────────────────────────────────┘ │
-└─────────────────────────────────────────────────────────────┘
+│                   Data Tier (Private Subnets)                │
+│  ┌─────────────────────────────────────────────────────────┐ │
+│  │     RDS MySQL Database Instance (inventory-db)          │ │
+│  │  - Private subnets across 2 Availability Zones          │ │
+│  │  - Multi-AZ capable configuration                       │ │
+│  │  - Managed backups and maintenance                      │ │
+│  └─────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ### Security Group Configuration
@@ -195,6 +228,9 @@ Successfully added 6 inventory records to the database:
 4. **Pastry Box - Small** - 100 units (Corrugated cardboard)
 5. **Café Napkins** - 1000 units (Pack of 2000)
 6. **Coffee Grinder** - 8 units (Burr grinder)
+
+![Created Inventory Records](images/20-web-app-inventory-records-created.png)
+*Successfully adding created inventory records displayed in the web application*
 
 #### Read Operations ✅
 - Application successfully displays all inventory records
@@ -250,7 +286,6 @@ Successfully added 6 inventory records to the database:
 - **Autoscaling Status**: Disabled (manual control for cost management)
 - **Backup Storage**: Automatically retained per AWS defaults
 - **Growth Rate**: ~100 KB per 100 inventory records
-
 ---
 
 ## Key Learnings & Observations
@@ -387,13 +422,23 @@ The simplicity of RDS compared to manual database administration is striking—w
 
 ## Screenshots & Evidence
 
-See the `/images` folder for supporting screenshots:
-- RDS console showing database creation
-- RDS connectivity & security endpoint
-- Web application with inventory records
-- Database instance details
+See the `/images` folder for supporting screenshots documenting all aspects of the lab:
+
+1. **Lab Setup** (01-02): AWS Details panel and initial web application
+2. **Database Configuration** (03-08): Engine selection, instance settings, networking, security, and monitoring
+3. **Database Creation** (09-10): Submission and available status
+4. **Connection Details** (11-12): Endpoint retrieval from RDS console
+5. **Application Integration** (13-16): Settings form, parameter entry, and successful connection
+6. **Credentials Management** (17-18): AWS Secrets Manager storing encrypted credentials
+7. **CRUD Operations** (19-25): Create, Read, Update, and Delete operations with inventory records
+8. **Monitoring & Availability** (26-27): RDS monitoring dashboard and instance details
+9. **Performance Metrics** (28-29): CloudWatch and enhanced monitoring data
+10. **Scaling Options** (30-31): Instance class and storage scaling options
+11. **Final State** (32): Completed RDS instance in AWS console
 
 ---
 
 **Lab Completion Date**: January 17, 2026  
 **Status**: ✅ COMPLETE - All objectives achieved, ready for submission
+
+![Lab Score](./images/lab-score.png)

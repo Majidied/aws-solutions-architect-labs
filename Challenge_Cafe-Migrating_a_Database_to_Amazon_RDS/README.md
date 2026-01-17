@@ -462,42 +462,42 @@ Benefits of New Architecture:
 │ Step 1: Create RDS Instance                                  │
 │ - Configure MariaDB with specific parameters                 │
 │ - Place in private subnet (dbSG security group)              │
-│ - Set master credentials                                      │
+│ - Set master credentials                                     │
 │ - Wait for "Available" status (~5 minutes)                   │
 └──────────────────────────────────────────────────────────────┘
               ↓
 ┌──────────────────────────────────────────────────────────────┐
-│ Step 2: Export Data from Source (EC2 Database)              │
+│ Step 2: Export Data from Source (EC2 Database)               │
 │ - Connect via Systems Manager Session Manager                │
 │ - Retrieve credentials from Secrets Manager                  │
-│ - Connect to local MariaDB (mysql -u root -p)               │
+│ - Connect to local MariaDB (mysql -u root -p)                │
 │ - Export using mysqldump (CafeDbDump.sql)                    │
-│ - File size: ~35 KB (containing full schema + data)         │
+│ - File size: ~35 KB (containing full schema + data)          │
 └──────────────────────────────────────────────────────────────┘
               ↓
 ┌──────────────────────────────────────────────────────────────┐
 │ Step 3: Configure Network Security                           │
 │ - Identify source SG (application server): sg-xxxx           │
-│ - Add inbound rule to dbSG: TCP 3306 from sg-xxxx           │
-│ - Verify with nmap (port 3306 shows open)                   │
+│ - Add inbound rule to dbSG: TCP 3306 from sg-xxxx            │
+│ - Verify with nmap (port 3306 shows open)                    │
 │ - Validate connection: mysql connect from EC2 to RDS         │
 └──────────────────────────────────────────────────────────────┘
               ↓
 ┌──────────────────────────────────────────────────────────────┐
 │ Step 4: Import Data into RDS                                 │
-│ - Connect to RDS instance (mysql -u admin -p --host xxx)    │
-│ - Import dump file (mysql -u admin -p < CafeDbDump.sql)     │
-│ - Verify data integrity (count records, check schemas)      │
-│ - Confirm all 24+ orders imported successfully              │
+│ - Connect to RDS instance (mysql -u admin -p --host xxx)     │
+│ - Import dump file (mysql -u admin -p < CafeDbDump.sql)      │
+│ - Verify data integrity (count records, check schemas)       │
+│ - Confirm all 24+ orders imported successfully               │
 └──────────────────────────────────────────────────────────────┘
               ↓
 ┌──────────────────────────────────────────────────────────────┐
 │ Step 5: Update Application Configuration                     │
 │ - Update Secrets Manager secrets:                            │
-│   - dbUrl → RDS endpoint                                    │
-│   - dbPassword → RDS master password                        │
-│   - dbUser → RDS admin username                             │
-│   - dbName → cafe_db (unchanged)                            │
+│   - dbUrl → RDS endpoint                                     │
+│   - dbPassword → RDS master password                         │
+│   - dbUser → RDS admin username                              │
+│   - dbName → cafe_db (unchanged)                             │
 └──────────────────────────────────────────────────────────────┘
               ↓
 ┌──────────────────────────────────────────────────────────────┐
@@ -513,231 +513,10 @@ Benefits of New Architecture:
 │ - Open café app in browser                                   │
 │ - Test placing a new order                                   │
 │ - Verify order appears in Order History                      │
-│ - Confirm all historical orders still accessible            │
+│ - Confirm all historical orders still accessible             │
 │ - Test complete CRUD operations                              │
 └──────────────────────────────────────────────────────────────┘
 ```
-
-![Migration Workflow Diagram](images/36-migration-workflow-steps.png)
-*Step-by-step migration process from EC2 database to RDS*
-
-### Data Export Process
-
-The `mysqldump` utility generated a complete SQL dump containing:
-
-```sql
--- Database creation
-CREATE DATABASE cafe_db;
-USE cafe_db;
-
--- Table definitions
-CREATE TABLE `order` (
-  `order_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `order_date` TIMESTAMP,
-  ...
-);
-
-CREATE TABLE `order_item` (
-  `order_item_id` INT AUTO_INCREMENT PRIMARY KEY,
-  `order_id` INT,
-  ...
-);
-
--- Data insertion
-INSERT INTO `order` VALUES (1, '2024-01-10 14:30:00', ...);
-INSERT INTO `order` VALUES (2, '2024-01-10 15:45:00', ...);
-... (22+ more orders)
-
-INSERT INTO `order_item` VALUES (1, 1, 'Coffee', 2, 4.50);
-INSERT INTO `order_item` VALUES (2, 1, 'Pastry', 1, 3.50);
-... (50+ more line items)
-```
-
-**Export File Statistics:**
-- Total file size: ~35 KB
-- Number of SQL statements: 100+
-- Data integrity: Complete schema and all 24+ orders with items
-
-### Data Import Validation
-
-I verified the import process by checking:
-
-1. **Schema Integrity**: All tables created with correct structure
-2. **Record Count**: 24+ orders and 50+ order items imported
-3. **Data Completeness**: Each order has associated order items
-4. **Referential Integrity**: No orphaned records (all order_items reference valid orders)
-
-![Data Validation Query Results](images/37-rds-data-validation-results.png)
-*Query results confirming complete data import with row counts*
-
----
-
-## Performance Metrics & Analysis
-
-### Migration Performance
-
-| Phase | Duration | Details |
-|-------|----------|---------|
-| RDS Instance Creation | ~5 minutes | Provisioning compute, storage, networking |
-| Database Export (mysqldump) | ~30 seconds | 35 KB dump file with 24+ orders |
-| Network Config Setup | ~3 minutes | Security group rule creation and verification |
-| Data Import (RDS) | ~15 seconds | Insert of 24+ orders and 50+ items |
-| Application Secrets Update | ~2 minutes | Update 3 secret values in Secrets Manager |
-| **Total Migration Time** | **~15 minutes** | End-to-end migration completion |
-
-### Database Performance Comparison
-
-#### Local Database (EC2) - Before Migration
-- **Instance Type**: General purpose (shared resources with app server)
-- **Storage**: EBS volume (same instance as application)
-- **Backup**: Manual backup process via cron jobs
-- **Patching**: Manual OS and MariaDB updates
-- **High Availability**: None (single point of failure)
-- **Monitoring**: OS-level only, no database-specific insights
-
-#### RDS Database - After Migration
-- **Instance Type**: db.t3.micro (dedicated, burstable)
-- **Storage**: EBS volume (separate from application, dedicated)
-- **Backup**: Automated daily backups (configurable retention)
-- **Patching**: Automated maintenance windows
-- **High Availability**: Multi-AZ capable (can enable with one click)
-- **Monitoring**: CloudWatch metrics + Database Insights
-
-![RDS Performance Monitoring Dashboard](images/38-rds-cloudwatch-monitoring.png)
-*RDS CloudWatch metrics showing CPU, database connections, and storage*
-
-### Query Performance
-
-**Before Migration (Local Database):**
-- Order listing query (~24 records): ~50-100ms (competing with web server for resources)
-- Order placement: ~100-150ms (database on same instance as PHP)
-
-**After Migration (RDS):**
-- Order listing query (~24 records): ~20-50ms (dedicated database tier)
-- Order placement: ~40-80ms (optimized network path, no resource contention)
-
-**Performance Improvement**: 30-50% query latency reduction despite network hop (VPC-local communication is very fast)
-
-### Storage Utilization
-
-| Metric | Value | Analysis |
-|--------|-------|----------|
-| **Current Data Size** | ~2 MB | 24+ orders with metadata |
-| **Allocated Storage** | 20 GiB | No autoscaling (manual control) |
-| **Utilization %** | 0.01% | Very low utilization, room for growth |
-| **Growth Rate** | ~50 KB/month | At current order rate (~5 orders/day) |
-| **Runway** | 8+ years | Sufficient without scaling for foreseeable future |
-
-![RDS Storage Utilization Graph](images/39-rds-storage-utilization-metrics.png)
-*Storage usage showing minimal utilization of 20 GiB allocation*
-
----
-
-## Key Learnings & Observations
-
-### 1. **Managed Services Dramatically Reduce Operational Burden**
-
-**Before Migration:**
-- Sofía responsible for: patching OS, patching MariaDB, manual backups, monitoring resources
-- Estimated effort: 4-8 hours per month
-
-**After Migration:**
-- AWS handles: patching, backups, monitoring, failover infrastructure
-- Sofía's effort: Setup and occasional parameter tuning only
-- **Labor savings**: ~90% reduction in database administration time
-
-This directly supports Martha's cost reduction goals for the café.
-
-### 2. **Security Group Rules Enable Fine-Grained Network Control**
-
-The principle of least privilege was implemented by:
-- Restricting database access to ONLY the application tier security group
-- Not opening port 3306 to all sources (0.0.0.0/0)
-- Using security group references rather than IP ranges
-
-**Security Benefits:**
-- If other EC2 instances are created, they can't access the database
-- Network-level enforcement doesn't depend on application logic
-- Easy to add read replicas with same security group pattern
-
-### 3. **Secrets Manager Integration Eliminates Hardcoded Credentials**
-
-The café application doesn't store database connection details in code. Instead:
-- Application reads secrets from Secrets Manager at runtime
-- Credentials can be rotated without redeploying application
-- Audit logs track credential access
-- Each environment can have different credentials
-
-**Example**: If password needs rotation for security, Sofía can update the `/cafe/dbPassword` secret, and the application automatically uses the new password on next request.
-
-### 4. **mysqldump Provides Simple, Reliable Database Migration**
-
-The export/import process:
-- Exports complete schema + data in one SQL file
-- Maintains referential integrity automatically
-- Works reliably without requiring additional tools
-- SQL format is portable across database servers
-
-**Alternative approaches** (not needed here):
-- AWS Database Migration Service (for larger, complex migrations)
-- AWS DataSync (for continuous synchronization)
-- Logical replication (for minimal downtime)
-
-### 5. **Systems Manager Session Manager Eliminates SSH Key Management**
-
-Rather than requiring SSH keys and managing access:
-- IAM policy (AmazonSSMManagedInstanceCore) grants access
-- Session logs are automatically captured in CloudTrail
-- No SSH ports need to be open (more secure than traditional access)
-- Works from any browser, no special client software needed
-
-### 6. **Network Latency Between EC2 and RDS is Negligible**
-
-One concern with separating database from application:
-- Network latency within same VPC: ~1-2ms
-- Query execution time: ~20-100ms
-- Network overhead: < 1% of total query time
-
-The separation is worth it for:
-- Independent scaling (can upgrade DB without touching web tier)
-- Backup and DR options (RDS has built-in replication)
-- Resource isolation (database can't starve the web server)
-
-### 7. **Data Integrity Verification is Critical in Migration**
-
-I validated the migration by:
-- Counting records in source and target
-- Checking that all orders have associated items
-- Testing CRUD operations on migrated data
-- Reviewing the visual appearance of data in application
-
-**Best Practice**: Always verify data integrity after migration, not just "if no errors appeared."
-
-### 8. **Multi-AZ Architecture is Just Configuration Away**
-
-The current RDS setup is single-AZ for cost savings. The infrastructure is pre-configured to support Multi-AZ:
-- DB subnet group spans two availability zones
-- RDS can enable synchronous replication with one configuration change
-- No application changes needed for failover
-
-**Future Enhancement Path:**
-- Current: Single-AZ (1 minute RTO if AZ fails)
-- Upgrade: Multi-AZ (automatic failover, 1-2 minute RTO)
-- Horizontal: Read replicas for reporting queries
-
-### 9. **Stopping Local Database is Better Than Deleting**
-
-Rather than deleting the local MariaDB database:
-- Stopped the service (prevents accidental writes)
-- Preserved the data (recovery possible if issues arise)
-- Saved disk space by not removing files
-- Followed safe migration practices
-
-**Timing for full removal:**
-- Wait 1-2 weeks to confirm new system stable
-- Monitor for any unexpected issues
-- Then safely delete old database to reclaim storage
-
 ---
 
 ## Completion Summary
@@ -752,120 +531,6 @@ Rather than deleting the local MariaDB database:
 | Migrate data to RDS | ✅ Complete | All 24+ orders and 50+ items imported, data integrity verified |
 | Configure application to use RDS | ✅ Complete | Secrets Manager updated, application successfully reads from RDS |
 | Test application functionality | ✅ Complete | Placed new order, all historical orders visible, CRUD operations working |
-
-### Key Accomplishments
-
-1. **Successfully migrated café database** from self-managed MariaDB on EC2 to AWS RDS
-2. **Zero data loss**: All 24+ orders with complete details preserved
-3. **Improved operational capability**: Automated backups, patching, monitoring now active
-4. **Enhanced security**: Database in private subnet, access controlled via security groups
-5. **Reduced labor costs**: Estimated 90% reduction in database administration time
-6. **Scalability path established**: Infrastructure ready for Multi-AZ and read replicas
-
-### Business Impact
-
-**For Martha (Finance):**
-- ✅ Reduced labor costs (less database administration needed)
-- ✅ Automated backups ensure no data loss for accounting records
-- ✅ Audit trails via CloudTrail provide compliance records
-
-**For Frank (Production Planning):**
-- ✅ Order history reliably available for dessert production planning
-- ✅ No risk of data loss due to failed EC2 instance
-- ✅ Better performance means more responsive application
-
-**For Sofía (System Administrator):**
-- ✅ No more manual patching and backup management
-- ✅ AWS handles database maintenance during automatic maintenance windows
-- ✅ Can focus on other infrastructure improvements (EC2 right-sizing, networking)
-
-### Post-Migration Infrastructure Status
-
-**RDS Instance:**
-- Status: Available
-- Engine: MariaDB
-- Instance Class: db.t3.micro
-- Storage: 20 GiB (0.01% utilized)
-- Backups: Automatic daily (7-day retention)
-- Monitoring: CloudWatch metrics active
-- Multi-AZ: Single-AZ (can be upgraded)
-
-**EC2 Application Instance:**
-- Status: Running (simplified - no database responsibility)
-- Database: Local MariaDB stopped (service disabled)
-- Web Application: Operational, connected to RDS
-- Security: dbSG and application tier security groups configured
-
-**Data Migration:**
-- Completion: 100%
-- Records Migrated: 24+ orders, 50+ order items
-- Data Integrity: Verified
-- Recovery: Production database is source of truth
-
-### Lessons for Future Migrations
-
-1. **Plan security first** - Configure network paths before migration day
-2. **Test connectivity early** - Verify EC2 → RDS communication before importing data
-3. **Verify data integrity** - Count records, check for orphans, validate sample data
-4. **Use Secrets Manager** - Never hardcode database credentials in applications
-5. **Keep old system running briefly** - Allows quick rollback if issues arise
-6. **Document the process** - Future migrations benefit from documented steps
-7. **Monitor post-migration** - Watch for slow queries, connection issues, or resource problems
-
----
-
-## Screenshots & Evidence
-
-The `/images` folder contains supporting screenshots documenting all aspects of the lab:
-
-**Initial Setup** (01-03):
-- AWS Lab Details panel
-- Pre-migration café application
-- Existing order history data
-
-**RDS Instance Creation** (04-10):
-- Engine selection (MariaDB)
-- Instance configuration (db.t3.micro)
-- Storage settings (20 GiB gp2)
-- Connectivity setup (VPC, subnet group, security group)
-- Creation status and timing
-
-**Database Export & Analysis** (11-20):
-- Systems Manager Session Manager terminal access
-- Local MariaDB service status
-- Secrets Manager credential retrieval
-- Database schema examination
-- mysqldump export process
-- Export file verification
-
-**Network Connectivity Setup** (21-26):
-- RDS endpoint retrieval
-- Security group configuration (port 3306)
-- nmap connectivity verification
-- Successful RDS connection establishment
-- Database readiness confirmation
-
-**Data Migration** (27-28):
-- RDS data import verification
-- Order table record count confirmation
-
-**Application Reconfiguration** (29-30):
-- Secrets Manager dbUrl update
-- Secrets Manager password update
-
-**Cutover & Testing** (31-34):
-- Local database service stopped
-- Application menu page displaying data from RDS
-- Order confirmation after placement
-- Order history showing all migrated + new orders
-
-**Monitoring & Analysis** (35-39):
-- Architecture comparison diagrams
-- Migration workflow visualization
-- CloudWatch performance metrics
-- Storage utilization graphs
-
----
 
 **Lab Completion Date**: January 17, 2026  
 **Challenge Lab Status**: ✅ COMPLETE  

@@ -101,10 +101,6 @@ I navigated to VPC console and created a peering connection:
 1. Opened AWS Management Console
 2. Searched for "VPC" in the search bar
 3. Selected VPC service
-
-![VPC Service Search](images/02-vpc-service-console-search.png)
-*Navigating to VPC service from management console*
-
 4. In left navigation pane, selected "Peering connections"
 5. Clicked "Create peering connection" button
 

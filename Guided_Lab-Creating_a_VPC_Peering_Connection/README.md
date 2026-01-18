@@ -231,10 +231,6 @@ I now configured the reverse route for Shared VPC:
 
 1. In Route Tables list, cleared Lab VPC route table selection
 2. Selected "Shared-VPC Route Table"
-
-![Route Tables - Shared VPC Selected](images/09-route-tables-shared-vpc-route-table-selected.png)
-*Selecting Shared-VPC Route Table for configuration*
-
 3. Selected the Routes tab
 4. Clicked "Edit routes"
 
@@ -352,13 +348,6 @@ I enabled flow logs on Shared VPC to monitor database traffic:
 
 ![Create Flow Log Dialog](images/13-create-flow-log-dialog-cloudwatch-destination.png)
 *Creating VPC Flow Log with CloudWatch Logs as destination*
-
-6. Clicked "Create flow log"
-
-**Result:** Flow log created successfully
-
-![Flow Log Created](images/14-shared-vpc-flow-log-created-shareplogs.png)
-*SharedVPCLogs flow log successfully created on Shared VPC*
 
 ### Verifying CloudWatch Log Group Creation
 
@@ -503,16 +492,6 @@ I navigated to the flow log CloudWatch log group:
 ![Flow Log Streams Populated](images/20-cloudwatch-flow-logs-eni-streams-populated.png)
 *Flow log streams now showing with captured network traffic*
 
-### Analyzing Traffic Patterns
-
-I selected a log stream and examined the traffic:
-
-1. Clicked on a log stream (eni-xxxxxxxxx)
-2. Reviewed the captured traffic records
-
-![Flow Log Records - Port 3306 MySQL Traffic](images/21-flow-logs-port-3306-mysql-traffic-records.png)
-*Flow log records showing MySQL traffic (port 3306) between application and database*
-
 **Traffic Analysis - MySQL Database Traffic:**
 
 **Record Example 1 - Application to Database:**
@@ -586,37 +565,37 @@ From flow logs over 5-minute window:
 ┌─────────────────────────────────────────────────────────────────┐
 │                      AWS Account                                │
 │                                                                 │
-│  ┌─────────────────────────┐    ┌──────────────────────────┐   │
-│  │   Lab VPC: 10.0.0.0/16  │    │  Shared VPC: 10.5.0.0/16 │   │
-│  │                         │    │                          │   │
-│  │ ┌───────────────────┐   │    │ ┌────────────────────┐   │   │
-│  │ │ Public Subnet     │   │    │ │ Private Subnet     │   │   │
-│  │ │ 10.0.0.0/24       │   │    │ │ 10.5.1.0/24        │   │   │
-│  │ │                   │   │    │ │                    │   │   │
-│  │ │ ┌───────────────┐ │   │    │ │ ┌──────────────┐   │   │   │
-│  │ │ │ EC2 Instance  │ │   │    │ │ │ RDS Database │   │   │   │
-│  │ │ │ 10.0.0.102    │ │   │    │ │ │ 10.5.1.185   │   │   │   │
-│  │ │ │ Inventory App │ │   │    │ │ │ MySQL Port   │   │   │   │
-│  │ │ │               │ │   │    │ │ │ 3306         │   │   │   │
-│  │ │ └───────────────┘ │   │    │ │ └──────────────┘   │   │   │
-│  │ │        ↓          │   │    │ │        ↑           │   │   │
-│  │ │  Route Table:     │   │    │ │  Route Table:      │   │   │
-│  │ │  10.5.0.0/16 →    │   │    │ │  10.0.0.0/16 →    │   │   │
-│  │ │  Lab-Peer         │   │    │ │  Lab-Peer          │   │   │
-│  │ │                   │   │    │ │                    │   │   │
-│  │ └───────────────────┘   │    │ └────────────────────┘   │   │
-│  │                         │    │                          │   │
-│  │ Internet Gateway ✓      │    │ No Internet Gateway ✗    │   │
-│  │ (for external users)    │    │ (isolated, peering only) │   │
-│  │                         │    │                          │   │
-│  └─────────────────────────┘    │ ┌──────────────────────┐ │   │
-│           ↓                      │ │ VPC Flow Logs        │ │   │
-│         Lab-Peer Peering Connection (Lab-Peer)         │ │   │
-│           ↓                      │ │ CloudWatch: Flow Log │ │   │
-│  ┌─────────────────────────┐    │ │ Records              │ │   │
-│  │   Internet Traffic      │    │ └──────────────────────┘ │   │
-│  │   (EC2 has public IP)   │    └──────────────────────────┘   │
-│  └─────────────────────────┘                                   │
+│  ┌─────────────────────────┐    ┌──────────────────────────┐    │
+│  │   Lab VPC: 10.0.0.0/16  │    │  Shared VPC: 10.5.0.0/16 │    │
+│  │                         │    │                          │    │
+│  │ ┌───────────────────┐   │    │ ┌────────────────────┐   │    │
+│  │ │ Public Subnet     │   │    │ │ Private Subnet     │   │    │
+│  │ │ 10.0.0.0/24       │   │    │ │ 10.5.1.0/24        │   │    │
+│  │ │                   │   │    │ │                    │   │    │
+│  │ │ ┌───────────────┐ │   │    │ │ ┌──────────────┐   │   │    │
+│  │ │ │ EC2 Instance  │ │   │    │ │ │ RDS Database │   │   │    │
+│  │ │ │ 10.0.0.102    │ │   │    │ │ │ 10.5.1.185   │   │   │    │
+│  │ │ │ Inventory App │ │   │    │ │ │ MySQL Port   │   │   │    │
+│  │ │ │               │ │   │    │ │ │ 3306         │   │   │    │
+│  │ │ └───────────────┘ │   │    │ │ └──────────────┘   │   │    │
+│  │ │        ↓          │   │    │ │        ↑           │   │    │
+│  │ │  Route Table:     │   │    │ │  Route Table:      │   │    │
+│  │ │  10.5.0.0/16 →    │   │    │ │  10.0.0.0/16 →     │   │    │
+│  │ │  Lab-Peer         │   │    │ │  Lab-Peer          │   │    │
+│  │ │                   │   │    │ │                    │   │    │
+│  │ └───────────────────┘   │    │ └────────────────────┘   │    │ 
+│  │                         │    │                          │    │
+│  │ Internet Gateway ✓      │    │ No Internet Gateway ✗    │    │
+│  │ (for external users)    │    │ (isolated, peering only) │    │
+│  │                         │    │                          │    │
+│  └─────────────────────────┘    │ ┌──────────────────────┐ │    │
+│           ↓                     │ │ VPC Flow Logs        │ │    │
+│         Lab-Peer Peering Connection (Lab-Peer)           │ │    │
+│           ↓                      │ │ CloudWatch: Flow Log│ │    │
+│  ┌─────────────────────────┐    │ │ Records              │ │    │
+│  │   Internet Traffic      │    │ └──────────────────────┘ │    │
+│  │   (EC2 has public IP)   │    └──────────────────────────┘    │
+│  └─────────────────────────┘                                    │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -1049,3 +1028,5 @@ The `/images` folder contains supporting screenshots documenting all lab steps:
 **Architecture Pattern**: ✅ MULTI-VPC PEERING WITH SHARED RESOURCES  
 
 **Ready for Submission** - VPC peering architecture successfully designed, configured, and tested with network monitoring enabled.
+
+![Lab Score](./images/lab-score.png)

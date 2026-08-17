@@ -1,267 +1,110 @@
-# AWS Solutions Architect Labs Portfolio
+# AWS Solutions Architect — Capstone Project & Labs Portfolio
 
-A comprehensive portfolio of hands-on AWS lab exercises demonstrating practical cloud architecture, infrastructure management, and performance optimization skills.
+[![AWS](https://img.shields.io/badge/AWS-Solutions%20Architect%20Associate-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/certification/certified-solutions-architect-associate/)
+[![Architecture](https://img.shields.io/badge/Architecture-Multi--Tier%20Secure-0073BB)](#-featured-capstone-project-secure-multi-tier-café-solution)
+[![Status](https://img.shields.io/badge/Status-Completed-success)](#-completed-labs--modules)
 
-## 📋 Overview
-
-This repository contains detailed completion reports and documentation for AWS Solutions Architect training labs. Each lab showcases practical experience with core AWS services, configuration management, performance monitoring, and best practices.
-
-**Portfolio Focus**: 
-- Cloud storage and file systems
-- Compute infrastructure and instance management
-- Networking and security configurations
-- Performance monitoring and optimization
-- Infrastructure as Code principles
+A production-grade AWS Cloud Architecture portfolio and graduation capstone project demonstrating end-to-end implementation of secure, resilient, and high-performance cloud solutions aligned with the **AWS Well-Architected Framework**.
 
 ---
 
-## 📁 Repository Structure
+## 🏆 Featured Capstone Project: Secure Multi-Tier Café Solution
+
+### **Title**: End-to-End Secure Multi-Tier Web Application & Database Architecture on AWS
+
+This capstone project combines and unifies core enterprise cloud patterns into an end-to-end, production-ready solution for a dynamic e-commerce web application (**The Café Ordering System**).
+
+### 📐 Solution Architecture Diagram
+
+![AWS Solution Architecture Diagram](./images/architecture-solution-diagram.svg)
+
+---
+
+### 🏛️ Architecture Breakdown & Design Decisions
+
+| Tier / Component | Subnet & CIDR | AWS Services Used | Security & Design Features |
+| :--- | :--- | :--- | :--- |
+| **Edge & Routing** | Public / Edge | **Internet Gateway (IGW)**, Public Route Table (`0.0.0.0/0 ➔ IGW`) | Direct internet entry point for legitimate user HTTP traffic and admin SSH connections. |
+| **DMZ / Public Tier** | `10.0.0.0/24` (Public) | **Bastion Host (EC2)**, **NAT Gateway**, Elastic IP | • **Bastion Host**: Jump box for administrative SSH access with key-forwarding.<br>• **NAT Gateway**: Allows isolated private instances to fetch OS/security patches without inbound public exposure. |
+| **Compute / Application Tier** | `10.0.1.0/24` (Private) | **EC2 Web Server (Amazon Linux 2)**, Apache HTTPD, PHP 8+ | • Isolated in private subnet (no public IPv4).<br>• Custom **Network ACL** and **Security Group** restricting ingress.<br>• Dynamic order processing engine with AWS SDK integration. |
+| **Database Tier** | `10.0.2.0/24` (Private) | **Amazon RDS MySQL**, DB Subnet Groups | • Decoupled managed database backend.<br>• Restricted inbound traffic on Port `3306` strictly from the Web Application Security Group.<br>• Automated backups and point-in-time recovery. |
+| **Security & Secrets** | AWS Regional Services | **AWS Secrets Manager**, AWS KMS | • Zero hardcoded credentials in application source code.<br>• Dynamic JSON credential retrieval over secure AWS API. |
+| **Disaster Recovery & Multi-Region** | Cross-Region (`us-west-2` & `us-east-1`) | **Amazon Machine Images (AMI)**, EBS Snapshots | • Standardized AMI creation for rapid environment provisioning and regional failover. |
+
+---
+
+### 🛡️ Alignment with AWS Well-Architected Pillars
+
+1. **Security (Defense-in-Depth)**:
+   - 4 layers of network defense: Internet Gateway, Network ACLs (stateless), Security Groups (stateful), and Subnet Isolation.
+   - Elimination of hardcoded secrets using **AWS Secrets Manager**.
+   - Bastion host architecture protecting the private compute instances from internet scanners.
+2. **Reliability & Availability**:
+   - Managed relational database with **Amazon RDS** eliminating single-server database failure.
+   - AMI-based deployment enabling rapid horizontal recreation across multiple AWS regions.
+3. **Performance Efficiency**:
+   - Compute and database layers operate on dedicated, right-sized infrastructure connected over high-speed AWS VPC backbone.
+4. **Cost Optimization**:
+   - Outbound internet consolidated through a shared NAT Gateway.
+   - Managed database eliminates licensing and maintenance overhead.
+
+---
+
+### 📂 Capstone Project Modules & Documentation
+
+This capstone project is documented across three primary implementation modules:
+
+1. 🌐 **[Networking & VPC Security Environment](./Challenge_Lab-Creating_a_VPC_Networking_Environment_for_the_Cafe/)**
+   - VPC design, public/private subnets, Internet Gateway, NAT Gateway, Network ACL rules, and Bastion Host deployment.
+2. ☕ **[Dynamic Web Application & Secrets Manager Integration](./Challenge_Cafe-Creating-a-Dynamic-Website-for-the-Cafe/)**
+   - LAMP stack configuration, dynamic PHP application setup, AWS Secrets Manager API integration, and multi-region AMI replication.
+3. 🗄️ **[Database Migration to Amazon RDS](./Challenge_Cafe-Migrating_a_Database_to_Amazon_RDS/)**
+   - Database schema export from EC2, DB Subnet Group provisioning, Amazon RDS MySQL deployment, data migration, and application reconfiguration.
+
+---
+
+## 🧪 Completed Labs & Modules
+
+| Module / Lab Name | Category | Primary AWS Services | Status | Report Link |
+| :--- | :--- | :--- | :---: | :--- |
+| **VPC Networking for Café** | Networking & Security | VPC, Subnets, IGW, NAT Gateway, Bastion, NACL | ✅ Completed | [View Report](./Challenge_Lab-Creating_a_VPC_Networking_Environment_for_the_Cafe/) |
+| **Dynamic Website for Café** | Compute & Security | EC2, LAMP, Secrets Manager, AMI, Multi-Region | ✅ Completed | [View Report](./Challenge_Cafe-Creating-a-Dynamic-Website-for-the-Cafe/) |
+| **Database Migration to RDS** | Databases & Migration | Amazon RDS MySQL, DB Subnets, mysqldump | ✅ Completed | [View Report](./Challenge_Cafe-Migrating_a_Database_to_Amazon_RDS/) |
+| **Creating a VPC from Scratch** | Networking | VPC, Subnet, Route Tables, Internet Gateway | ✅ Completed | [View Report](./Guided_Lab-Creating_a_VPC/) |
+| **VPC Peering Connection** | Networking | VPC Peering, Cross-VPC Routing, Security Groups | ✅ Completed | [View Report](./Guided_Lab-Creating_a_VPC_Peering_Connection/) |
+| **Creating an Amazon RDS DB** | Databases | Amazon RDS MySQL, Security Groups, Client Access | ✅ Completed | [View Report](./Guided_Lab-Creating_an_Amazon_RDS_Database/) |
+| **Introducing Amazon EFS** | Storage & File Systems | Amazon EFS, EC2, fio benchmarking, CloudWatch | ✅ Completed | [View Report](./Guided_Lab-Introducing-Amazon-EFS/) |
+
+---
+
+## 🔧 Skills & AWS Services Demonstrated
 
 ```
-aws-solutions-architect-labs/
-├── README.md                          # This file
-├── Introducing-Amazon-EFS/
-│   ├── README.md                      # Lab completion report
-│   └── images/                        # Screenshots and diagrams
-│       ├── security-group-setup.png
-│       ├── efs-creation.png
-│       ├── ec2-connection.png
-│       ├── efs-mount.png
-│       ├── fio-output.png
-│       ├── cloudwatch-permitted-throughput.png
-│       └── cloudwatch-datawrite-iobytes.png
-└── [Additional labs...]
+┌────────────────────────────────────────────────────────────────────────┐
+│                        AWS SOLUTIONS ARCHITECT                         │
+├──────────────────┬──────────────────┬──────────────────┬───────────────┤
+│ Networking       │ Compute          │ Database/Storage │ Security      │
+├──────────────────┼──────────────────┼──────────────────┼───────────────┤
+│ • Custom VPCs    │ • EC2 Instances  │ • Amazon RDS     │ • IAM Roles   │
+│ • Public/Private │ • User Data / OS │ • Amazon EFS     │ • Secrets Mgr │
+│ • NAT Gateway    │ • Custom AMIs    │ • Multi-AZ DB    │ • Sec. Groups │
+│ • IGW & Routing  │ • Multi-Region   │ • EBS Volumes    │ • Net ACLs    │
+│ • VPC Peering    │ • LAMP Stack     │ • DB Subnet Grps │ • Bastion SSH │
+└──────────────────┴──────────────────┴──────────────────┴───────────────┘
 ```
 
-Each lab directory contains:
-- **README.md** - Detailed completion report with findings and analysis
-- **images/** - Screenshots and supporting documentation
+---
+
+## 🚀 How to Review and Navigate This Portfolio
+
+1. **Architecture & Design**: Examine the [Architecture Diagram](./images/architecture-solution-diagram.svg) and design choices above.
+2. **Deep-Dive Reports**: Click any of the report links in the table above to view detailed step-by-step procedures, configuration parameters, and verification tests.
+3. **Visual Proofs**: Each lab directory contains an `images/` folder with console screenshots confirming operational status and testing results.
 
 ---
 
-## 🧪 Completed Labs
+## 📜 Attribution & Verification
 
-### 1. [Introducing Amazon Elastic File System (Amazon EFS)](./Introducing-Amazon-EFS/)
-
-**Status**: ✅ Complete
-
-**Objective**: Create, configure, and test an Amazon EFS file system with EC2 integration and performance monitoring.
-
-**Key Skills Demonstrated**:
-- AWS Management Console navigation
-- Security group configuration for NFS access
-- EFS provisioning and mount target configuration
-- EC2 instance management via Session Manager
-- Linux file system operations
-- Performance benchmarking with fio
-- CloudWatch metrics analysis
-- Write throughput calculation and optimization
-
-**Services Used**:
-- Amazon EFS (Elastic File System)
-- Amazon EC2 (Elastic Compute Cloud)
-- AWS Systems Manager Session Manager
-- Amazon CloudWatch
-
-**Key Findings**:
-- Successfully mounted EFS across multiple availability zones
-- Achieved sustained write throughput of ~127 MB/s
-- Demonstrated EFS burst capacity of 3GB/s
-- Verified performance scaling characteristics
-
-**Duration**: ~30 minutes | **Difficulty**: Beginner
-
-[View Full Lab Report](./Introducing-Amazon-EFS/)
-
----
-
-## 🎯 Portfolio Goals
-
-This portfolio demonstrates:
-
-✅ **Hands-on AWS Experience**
-- Practical configuration of AWS services through the Management Console
-- Real-world problem-solving and troubleshooting
-
-✅ **Technical Proficiency**
-- Understanding of AWS service architecture and integration
-- Ability to configure security, networking, and performance settings
-
-✅ **Analysis & Monitoring**
-- Performance metric interpretation
-- Data-driven optimization decisions
-- Real-time monitoring using CloudWatch
-
-✅ **Documentation Excellence**
-- Clear, detailed technical documentation
-- Professional presentation of findings
-- Structured reporting of results
-
----
-
-## 📊 Skills by Category
-
-### Cloud Storage
-- Amazon EFS provisioning and configuration
-- File system performance optimization
-- Multi-AZ deployment patterns
-- NFS protocol and mount configuration
-
-### Compute & Networking
-- EC2 instance management
-- Security group configuration
-- SSH/Session Manager access
-- Network file system protocols
-
-### Monitoring & Performance
-- CloudWatch metrics analysis
-- I/O performance benchmarking
-- Throughput measurement and calculation
-- Real-time monitoring dashboards
-
-### Infrastructure & Best Practices
-- Multi-availability zone design
-- Security-first configuration
-- Performance-optimized settings
-- AWS resource documentation
-
----
-
-## 🚀 How to Use This Portfolio
-
-1. **Browse Labs**: Each lab directory contains a complete report
-2. **View Details**: Open individual lab README.md files for comprehensive analysis
-3. **Review Screenshots**: Check the images/ folder for visual evidence of completion
-4. **Study Findings**: Review performance metrics and key learnings
-5. **Understand Processes**: Follow the documented procedures for reference
-
----
-
-## 📈 Lab Progress
-
-| Lab Name | Status | Completion Date | Difficulty | Duration |
-|----------|--------|-----------------|------------|----------|
-| Introducing Amazon EFS | ✅ Complete | Jan 16, 2026 | Beginner | 30 min |
-| | | | | |
-| | | | | |
-
----
-
-## 🔧 Technologies & Tools Used
-
-### AWS Services
-- Amazon EFS (Elastic File System)
-- Amazon EC2 (Elastic Compute Cloud)
-- AWS Systems Manager Session Manager
-- Amazon CloudWatch
-- AWS Identity and Access Management (IAM)
-- AWS VPC (Virtual Private Cloud)
-
-### Linux Tools & Utilities
-- amazon-efs-utils (EFS mounting utility)
-- fio (Flexible I/O benchmarking tool)
-- df, mount, and filesystem commands
-- bash scripting
-
-### Monitoring & Analysis Tools
-- CloudWatch Metrics
-- CloudWatch Dashboards
-- Log analysis
-
----
-
-## 📚 Learning Outcomes
-
-Through these labs, I have gained practical experience in:
-
-1. **Cloud Infrastructure Design**
-   - Understanding shared file storage patterns
-   - Multi-AZ architecture considerations
-   - High-availability configuration
-
-2. **Security Best Practices**
-   - Security group rule configuration
-   - NFS access control
-   - Network isolation and VPC integration
-
-3. **Performance Optimization**
-   - I/O benchmarking methodologies
-   - Throughput analysis and calculation
-   - Performance metric interpretation
-
-4. **AWS Service Integration**
-   - Cross-service integration patterns
-   - EC2 to EFS connectivity
-   - CloudWatch monitoring integration
-
-5. **Documentation & Reporting**
-   - Technical documentation writing
-   - Performance metrics presentation
-   - Professional portfolio creation
-
----
-
-## 📝 Lab Report Format
-
-Each lab report includes:
-
-- **Project Overview**: High-level summary of completed work
-- **Objectives Completed**: Checklist of achieved goals
-- **Step-by-Step Documentation**: Detailed procedures and outcomes
-- **Configuration Details**: Specific settings and parameters
-- **Results & Findings**: Actual performance metrics and observations
-- **Analysis**: Data interpretation and performance calculations
-- **Key Learnings**: Insights and best practices discovered
-- **Completion Summary**: Status and skills demonstrated
-
----
-
-## 🎓 Continuing Education
-
-This portfolio is part of ongoing AWS Solutions Architect training. Additional labs will be added as they are completed, expanding coverage of:
-
-- Compute services (Lambda, ECS, EC2 Auto Scaling)
-- Networking and CDN (CloudFront, Route 53, VPN)
-- Database services (RDS, DynamoDB, ElastiCache)
-- Security and compliance services
-- Application integration services
-- Analytics and big data services
-
----
-
-## 📧 Contact & Attribution
-
-This portfolio documents labs from **AWS Training and Certification Program**.
-
-- **Training Provider**: Amazon Web Services
-- **Program**: AWS Solutions Architect Associate Training
-- **Portfolio Created**: January 2026
-
-For more information about AWS Training and Certification:
-- [AWS Training & Certification](https://aws.amazon.com/training/)
-- [AWS Solutions Architect Associate Exam](https://aws.amazon.com/certification/certified-solutions-architect-associate/)
-
----
-
-## 📄 License & Attribution
-
-Labs and training materials are based on AWS Training and Certification content.
-
-**© 2023 Amazon Web Services, Inc. and its affiliates. All rights reserved.**
-
----
-
-## 🏁 Getting Started
-
-To explore this portfolio:
-
-1. **Start with the [EFS Lab Report](./Introducing-Amazon-EFS/)** - Introduction to EFS and file system concepts
-2. **Review the images folder** - Visual documentation of each step
-3. **Study the findings section** - Performance metrics and analysis
-4. **Check back regularly** - New labs will be added as they're completed
-
----
-
-**Last Updated**: January 16, 2026  
-**Total Labs Completed**: 1  
-**Status**: In Progress ✨
+- **Program**: AWS Solutions Architect Associate (SAA) Training & Hands-On Challenge Labs
+- **Standard**: AWS Well-Architected Framework
+- **Deliverables**: Solution Architecture Diagram + GitHub Repository Documentation

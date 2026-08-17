@@ -1,0 +1,262 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%" style="background-color: #0d1117; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="headerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FF9900" />
+      <stop offset="100%" stop-color="#FF5500" />
+    </linearGradient>
+    <linearGradient id="vpcGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8" />
+      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.9" />
+    </linearGradient>
+    <linearGradient id="pubSubnetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e3a5f" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#0f2035" stop-opacity="0.6" />
+    </linearGradient>
+    <linearGradient id="privSubnetGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#14362b" stop-opacity="0.4" />
+      <stop offset="100%" stop-color="#091f18" stop-opacity="0.6" />
+    </linearGradient>
+    <linearGradient id="cardGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1e293b" />
+      <stop offset="100%" stop-color="#0f172a" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="dropShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+
+    <!-- Markers for arrows -->
+    <marker id="arrowHttp" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 1 L 6 4 L 0 7 z" fill="#38bdf8" />
+    </marker>
+    <marker id="arrowSsh" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 1 L 6 4 L 0 7 z" fill="#fbbf24" />
+    </marker>
+    <marker id="arrowSql" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 1 L 6 4 L 0 7 z" fill="#34d399" />
+    </marker>
+    <marker id="arrowSec" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M 0 1 L 6 4 L 0 7 z" fill="#c084fc" />
+    </marker>
+  </defs>
+
+  <!-- Title & Header Bar -->
+  <rect x="25" y="20" width="950" height="50" rx="8" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <rect x="35" y="30" width="6" height="30" rx="3" fill="url(#headerGrad)"/>
+  <text x="52" y="44" fill="#ffffff" font-size="16" font-weight="bold">AWS Solutions Architect — Capstone Project Architecture</text>
+  <text x="52" y="60" fill="#94a3b8" font-size="12">Secure Multi-Tier Web Application &amp; Database Solution (Café Enterprise Architecture)</text>
+  <rect x="800" y="30" width="160" height="30" rx="15" fill="#232f3e" stroke="#ff9900" stroke-width="1"/>
+  <text x="880" y="49" fill="#ff9900" font-size="11" font-weight="bold" text-anchor="middle">AWS Well-Architected</text>
+
+  <!-- INTERNET & USERS ZONE (Left Column) -->
+  <rect x="25" y="85" width="160" height="570" rx="10" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="105" y="112" fill="#94a3b8" font-size="12" font-weight="bold" text-anchor="middle">CLIENTS &amp; ADMINS</text>
+
+  <!-- Users Node -->
+  <g transform="translate(45, 140)" filter="url(#dropShadow)">
+    <rect width="120" height="90" rx="8" fill="url(#cardGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+    <circle cx="60" cy="32" r="14" fill="#0284c7" fill-opacity="0.3"/>
+    <text x="60" y="37" fill="#38bdf8" font-size="16" text-anchor="middle">👥</text>
+    <text x="60" y="60" fill="#f8fafc" font-size="12" font-weight="bold" text-anchor="middle">Web Users</text>
+    <text x="60" y="75" fill="#38bdf8" font-size="10" text-anchor="middle">HTTP Traffic (80)</text>
+  </g>
+
+  <!-- Admin Node -->
+  <g transform="translate(45, 270)" filter="url(#dropShadow)">
+    <rect width="120" height="90" rx="8" fill="url(#cardGrad)" stroke="#fbbf24" stroke-width="1.5"/>
+    <circle cx="60" cy="32" r="14" fill="#b45309" fill-opacity="0.3"/>
+    <text x="60" y="37" fill="#fbbf24" font-size="16" text-anchor="middle">💻</text>
+    <text x="60" y="60" fill="#f8fafc" font-size="12" font-weight="bold" text-anchor="middle">SysAdmin</text>
+    <text x="60" y="75" fill="#fbbf24" font-size="10" text-anchor="middle">SSH Access (22)</text>
+  </g>
+
+  <!-- External Services / Multi-Region Box -->
+  <g transform="translate(45, 410)" filter="url(#dropShadow)">
+    <rect width="120" height="110" rx="8" fill="url(#cardGrad)" stroke="#a855f7" stroke-width="1"/>
+    <circle cx="60" cy="30" r="12" fill="#7e22ce" fill-opacity="0.3"/>
+    <text x="60" y="35" fill="#c084fc" font-size="14" text-anchor="middle">🌐</text>
+    <text x="60" y="55" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">Multi-Region</text>
+    <text x="60" y="70" fill="#c084fc" font-size="10" text-anchor="middle">AMI Replication</text>
+    <text x="60" y="85" fill="#94a3b8" font-size="9" text-anchor="middle">us-west-2 (Oregon)</text>
+    <text x="60" y="98" fill="#94a3b8" font-size="9" text-anchor="middle">us-east-1 (N. Virginia)</text>
+  </g>
+
+  <!-- AWS CLOUD / VPC ZONE -->
+  <rect x="210" y="85" width="765" height="570" rx="10" fill="url(#vpcGrad)" stroke="#ff9900" stroke-width="1.5" stroke-dasharray="6,4"/>
+  <rect x="225" y="95" width="130" height="24" rx="4" fill="#ff9900"/>
+  <text x="290" y="111" fill="#000000" font-size="11" font-weight="bold" text-anchor="middle">AWS Cloud (Region)</text>
+  
+  <rect x="365" y="95" width="175" height="24" rx="4" fill="#232f3e" stroke="#38bdf8" stroke-width="1"/>
+  <text x="452" y="111" fill="#38bdf8" font-size="11" font-weight="bold" text-anchor="middle">VPC: 10.0.0.0/16 (Lab VPC)</text>
+
+  <!-- Internet Gateway (IGW) -->
+  <g transform="translate(240, 200)" filter="url(#dropShadow)">
+    <rect width="60" height="180" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+    <text x="30" y="30" fill="#38bdf8" font-size="18" text-anchor="middle">⚡</text>
+    <text x="30" y="60" fill="#f8fafc" font-size="11" font-weight="bold" text-anchor="middle">IGW</text>
+    <text x="30" y="80" fill="#94a3b8" font-size="9" text-anchor="middle">Internet</text>
+    <text x="30" y="95" fill="#94a3b8" font-size="9" text-anchor="middle">Gateway</text>
+    <line x1="10" y1="110" x2="50" y2="110" stroke="#334155" stroke-width="1"/>
+    <text x="30" y="135" fill="#38bdf8" font-size="8" text-anchor="middle">Public</text>
+    <text x="30" y="150" fill="#38bdf8" font-size="8" text-anchor="middle">Routing</text>
+  </g>
+
+  <!-- 1. PUBLIC SUBNET (DMZ) -->
+  <rect x="325" y="135" width="185" height="500" rx="8" fill="url(#pubSubnetGrad)" stroke="#38bdf8" stroke-width="1.2"/>
+  <rect x="335" y="145" width="165" height="22" rx="4" fill="#0369a1"/>
+  <text x="417" y="160" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">Public Subnet (10.0.0.0/24)</text>
+
+  <!-- Bastion Host in Public Subnet -->
+  <g transform="translate(345, 185)" filter="url(#dropShadow)">
+    <rect width="145" height="135" rx="8" fill="url(#cardGrad)" stroke="#fbbf24" stroke-width="1.5"/>
+    <rect x="10" y="10" width="24" height="24" rx="4" fill="#b45309" fill-opacity="0.4"/>
+    <text x="22" y="27" fill="#fbbf24" font-size="13" text-anchor="middle">🛡️</text>
+    <text x="42" y="24" fill="#ffffff" font-size="11" font-weight="bold">Bastion Host</text>
+    <text x="42" y="35" fill="#fbbf24" font-size="9">EC2 Jump Box</text>
+    <text x="12" y="60" fill="#94a3b8" font-size="9">• Public IP: 54.x.x.x</text>
+    <text x="12" y="75" fill="#94a3b8" font-size="9">• SG: Inbound SSH (22)</text>
+    <text x="12" y="90" fill="#94a3b8" font-size="9">• SSH Key Forwarding</text>
+    <rect x="10" y="102" width="125" height="20" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="72" y="116" fill="#fbbf24" font-size="9" text-anchor="middle">Secure Admin Gateway</text>
+  </g>
+
+  <!-- NAT Gateway in Public Subnet -->
+  <g transform="translate(345, 345)" filter="url(#dropShadow)">
+    <rect width="145" height="120" rx="8" fill="url(#cardGrad)" stroke="#38bdf8" stroke-width="1.5"/>
+    <rect x="10" y="10" width="24" height="24" rx="4" fill="#0284c7" fill-opacity="0.4"/>
+    <text x="22" y="27" fill="#38bdf8" font-size="13" text-anchor="middle">🔄</text>
+    <text x="42" y="24" fill="#ffffff" font-size="11" font-weight="bold">NAT Gateway</text>
+    <text x="42" y="35" fill="#38bdf8" font-size="9">Managed Outbound</text>
+    <text x="12" y="60" fill="#94a3b8" font-size="9">• Elastic IP Attached</text>
+    <text x="12" y="75" fill="#94a3b8" font-size="9">• Routes 0.0.0.0/0 to IGW</text>
+    <rect x="10" y="88" width="125" height="20" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="72" y="102" fill="#38bdf8" font-size="8.5" text-anchor="middle">Outbound Internet Only</text>
+  </g>
+
+  <!-- Public Route Table Badge -->
+  <g transform="translate(345, 485)">
+    <rect width="145" height="40" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+    <text x="72" y="16" fill="#94a3b8" font-size="9" font-weight="bold" text-anchor="middle">Public Route Table</text>
+    <text x="72" y="30" fill="#38bdf8" font-size="8.5" text-anchor="middle">0.0.0.0/0 ➔ IGW</text>
+  </g>
+
+  <!-- 2. PRIVATE APPLICATION SUBNET -->
+  <rect x="535" y="135" width="205" height="500" rx="8" fill="url(#privSubnetGrad)" stroke="#34d399" stroke-width="1.2"/>
+  <rect x="545" y="145" width="185" height="22" rx="4" fill="#065f46"/>
+  <text x="637" y="160" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">Private App Subnet (10.0.1.0/24)</text>
+
+  <!-- Web Application EC2 Instance -->
+  <g transform="translate(550, 185)" filter="url(#dropShadow)">
+    <rect width="175" height="235" rx="8" fill="url(#cardGrad)" stroke="#34d399" stroke-width="1.5"/>
+    <rect x="10" y="10" width="26" height="26" rx="4" fill="#047857" fill-opacity="0.4"/>
+    <text x="23" y="28" fill="#34d399" font-size="14" text-anchor="middle">☕</text>
+    <text x="45" y="24" fill="#ffffff" font-size="11" font-weight="bold">Café Web App Server</text>
+    <text x="45" y="36" fill="#34d399" font-size="9">EC2 (Amazon Linux 2)</text>
+    
+    <text x="12" y="62" fill="#94a3b8" font-size="9">• Private IP: 10.0.1.x</text>
+    <text x="12" y="77" fill="#94a3b8" font-size="9">• Stack: Apache HTTPD + PHP</text>
+    <text x="12" y="92" fill="#94a3b8" font-size="9">• App: Dynamic Café Ordering</text>
+    <text x="12" y="107" fill="#94a3b8" font-size="9">• SG: Port 80 (App) + Port 22 (SSH)</text>
+    <text x="12" y="122" fill="#94a3b8" font-size="9">• Custom Network ACL</text>
+
+    <!-- Sub-boxes inside EC2 -->
+    <rect x="10" y="135" width="155" height="40" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="87" y="150" fill="#38bdf8" font-size="8.5" font-weight="bold" text-anchor="middle">App Logic &amp; Session API</text>
+    <text x="87" y="165" fill="#94a3b8" font-size="8" text-anchor="middle">PHP Order Processing Engine</text>
+
+    <rect x="10" y="182" width="155" height="40" rx="4" fill="#1e293b" stroke="#a855f7" stroke-width="1"/>
+    <text x="87" y="197" fill="#c084fc" font-size="8.5" font-weight="bold" text-anchor="middle">AWS SDK / Secrets Client</text>
+    <text x="87" y="212" fill="#94a3b8" font-size="8" text-anchor="middle">Retrieves DB Secret JSON dynamically</text>
+  </g>
+
+  <!-- Private Route Table Badge -->
+  <g transform="translate(550, 485)">
+    <rect width="175" height="40" rx="6" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+    <text x="87" y="16" fill="#94a3b8" font-size="9" font-weight="bold" text-anchor="middle">Private Route Table</text>
+    <text x="87" y="30" fill="#34d399" font-size="8.5" text-anchor="middle">0.0.0.0/0 ➔ NAT Gateway</text>
+  </g>
+
+  <!-- 3. PRIVATE DATABASE SUBNET -->
+  <rect x="765" y="135" width="195" height="500" rx="8" fill="url(#privSubnetGrad)" stroke="#f43f5e" stroke-width="1.2"/>
+  <rect x="775" y="145" width="175" height="22" rx="4" fill="#881337"/>
+  <text x="862" y="160" fill="#ffffff" font-size="10" font-weight="bold" text-anchor="middle">Private DB Subnet (10.0.2.0/24)</text>
+
+  <!-- RDS Instance -->
+  <g transform="translate(780, 185)" filter="url(#dropShadow)">
+    <rect width="165" height="205" rx="8" fill="url(#cardGrad)" stroke="#f43f5e" stroke-width="1.5"/>
+    <rect x="10" y="10" width="26" height="26" rx="4" fill="#be123c" fill-opacity="0.4"/>
+    <text x="23" y="28" fill="#fb7185" font-size="14" text-anchor="middle">🗄️</text>
+    <text x="45" y="24" fill="#ffffff" font-size="11" font-weight="bold">Amazon RDS</text>
+    <text x="45" y="36" fill="#fb7185" font-size="9">Managed MySQL DB</text>
+
+    <text x="12" y="62" fill="#94a3b8" font-size="9">• Subnet Group: DB-Subnets</text>
+    <text x="12" y="77" fill="#94a3b8" font-size="9">• Engine: MySQL Community</text>
+    <text x="12" y="92" fill="#94a3b8" font-size="9">• Port: 3306 (Inbound from App)</text>
+    <text x="12" y="107" fill="#94a3b8" font-size="9">• Multi-AZ Failover Ready</text>
+    <text x="12" y="122" fill="#94a3b8" font-size="9">• Automated Backups &amp; Snapshots</text>
+
+    <rect x="10" y="140" width="145" height="50" rx="4" fill="#1e293b" stroke="#334155" stroke-width="1"/>
+    <text x="82" y="157" fill="#fb7185" font-size="8.5" font-weight="bold" text-anchor="middle">Café Database Schema</text>
+    <text x="82" y="172" fill="#94a3b8" font-size="8" text-anchor="middle">Tables: products, orders, users</text>
+  </g>
+
+  <!-- AWS Secrets Manager Service Component -->
+  <g transform="translate(780, 415)" filter="url(#dropShadow)">
+    <rect width="165" height="110" rx="8" fill="url(#cardGrad)" stroke="#c084fc" stroke-width="1.5"/>
+    <rect x="10" y="10" width="24" height="24" rx="4" fill="#7e22ce" fill-opacity="0.4"/>
+    <text x="22" y="27" fill="#c084fc" font-size="13" text-anchor="middle">🔑</text>
+    <text x="42" y="24" fill="#ffffff" font-size="10.5" font-weight="bold">AWS Secrets Mgr</text>
+    <text x="42" y="35" fill="#c084fc" font-size="8.5">db_secrets (KMS Encrypted)</text>
+
+    <text x="12" y="58" fill="#94a3b8" font-size="8.5">• Key: username &amp; password</text>
+    <text x="12" y="73" fill="#94a3b8" font-size="8.5">• Host: RDS endpoint DNS</text>
+    <text x="12" y="88" fill="#94a3b8" font-size="8.5">• Zero hardcoded credentials</text>
+  </g>
+
+  <!-- CONNECTIVITY ARROWS -->
+
+  <!-- HTTP Traffic: Users -> IGW -> WebApp -->
+  <path d="M 165 185 L 240 230" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowHttp)"/>
+  <path d="M 300 230 L 550 230" fill="none" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowHttp)"/>
+
+  <!-- SSH Traffic: Admin -> IGW -> Bastion -->
+  <path d="M 165 315 L 240 315" fill="none" stroke="#fbbf24" stroke-width="2" marker-end="url(#arrowSsh)"/>
+  <path d="M 300 315 L 345 250" fill="none" stroke="#fbbf24" stroke-width="2" marker-end="url(#arrowSsh)"/>
+
+  <!-- SSH Passthrough: Bastion -> WebApp Private -->
+  <path d="M 490 250 L 550 250" fill="none" stroke="#fbbf24" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowSsh)"/>
+
+  <!-- SQL Connection: WebApp -> RDS -->
+  <path d="M 725 250 L 780 250" fill="none" stroke="#34d399" stroke-width="2.5" marker-end="url(#arrowSql)"/>
+
+  <!-- Outbound Updates: WebApp -> NAT Gateway -->
+  <path d="M 550 370 L 490 370" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowHttp)"/>
+  <path d="M 345 370 L 300 370" fill="none" stroke="#38bdf8" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowHttp)"/>
+
+  <!-- Secrets Manager Call: WebApp -> Secrets Manager -->
+  <path d="M 640 420 L 640 460 L 780 460" fill="none" stroke="#c084fc" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arrowSec)"/>
+
+  <!-- AMI Multi-Region: WebApp -> Multi-Region Box -->
+  <path d="M 550 400 L 220 400 L 165 440" fill="none" stroke="#a855f7" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+  <!-- LEGEND (Bottom Bar) -->
+  <rect x="25" y="630" width="950" height="35" rx="6" fill="#161b22" stroke="#30363d" stroke-width="1"/>
+  <text x="40" y="652" fill="#94a3b8" font-size="10" font-weight="bold">LÉGENDE :</text>
+  
+  <line x1="110" y1="648" x2="135" y2="648" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowHttp)"/>
+  <text x="145" y="652" fill="#38bdf8" font-size="9">Trafic Web (HTTP/80)</text>
+
+  <line x1="280" y1="648" x2="305" y2="648" stroke="#fbbf24" stroke-width="2" marker-end="url(#arrowSsh)"/>
+  <text x="315" y="652" fill="#fbbf24" font-size="9">Admin SSH Sécurisé (22)</text>
+
+  <line x1="470" y1="648" x2="495" y2="648" stroke="#34d399" stroke-width="2" marker-end="url(#arrowSql)"/>
+  <text x="505" y="652" fill="#34d399" font-size="9">Requêtes SQL MySQL (3306)</text>
+
+  <line x1="680" y1="648" x2="705" y2="648" stroke="#c084fc" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#arrowSec)"/>
+  <text x="715" y="652" fill="#c084fc" font-size="9">API AWS Secrets Manager</text>
+
+  <circle cx="890" cy="648" r="4" fill="#22c55e"/>
+  <text x="900" y="652" fill="#22c55e" font-size="9">Zero Direct DB Exposure</text>
+</svg>

@@ -1,0 +1,22 @@
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets & Keys
+.env
+.env.*
+!.env.example
+*.pem
+*.ppk
+*.key
+
+# Terraform / IaC
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+
+# Temporary / Audit files
+REPO_AUDIT.md

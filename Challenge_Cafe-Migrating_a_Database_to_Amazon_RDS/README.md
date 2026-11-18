@@ -114,7 +114,7 @@ I created the MariaDB RDS instance through the AWS Management Console with the f
 |-----------|-------|-----------|
 | DB Instance Identifier | CafeDatabase | Clear, business-meaningful naming convention |
 | Master Username | admin | Standard administrative user |
-| Master Password | Caf3DbPassw0rd! | Complex password matching security requirements |
+| Master Password | <RDS_MASTER_PASSWORD> | Complex password matching security requirements |
 | Instance Class | db.t3.micro | Burstable class for variable workloads |
 | Storage Type | General Purpose SSD (gp2) | Balanced price-to-performance ratio |
 | Allocated Storage | 20 GiB | Sufficient for historical order data |
@@ -228,14 +228,14 @@ I located the RDS endpoint from the instance details:
 ![RDS Connectivity Details - Endpoint](images/22-rds-endpoint-connectivity-security.png)
 *RDS Connectivity & Security section showing the database endpoint*
 
-**RDS Endpoint**: `cafedatabase.crwxbgqad61a.us-east-1.rds.amazonaws.com`
+**RDS Endpoint**: `cafedatabase.<rds-id>.us-east-1.rds.amazonaws.com`
 
 #### Attempting Initial Connection
 
 Without security group modification, the connection attempt would fail:
 
 ```bash
-mysql -u admin -p --host cafedatabase.crwxbgqad61a.us-east-1.rds.amazonaws.com
+mysql -u admin -p --host cafedatabase.<rds-id>.us-east-1.rds.amazonaws.com
 ```
 
 **Challenge Encountered**: Connection timeout - Network security group rule didn't permit traffic from EC2 instance to RDS on port 3306
@@ -260,7 +260,7 @@ I updated the **dbSG** security group to allow inbound access:
 With the security group configured, I successfully connected:
 
 ```bash
-mysql -u admin -p --host cafedatabase.crwxbgqad61a.us-east-1.rds.amazonaws.com
+mysql -u admin -p --host cafedatabase.<rds-id>.us-east-1.rds.amazonaws.com
 ```
 
 **Database verification commands:**
@@ -287,7 +287,7 @@ Import the migrated café data into the new RDS instance and reconfigure the web
 I imported the exported SQL dump into the RDS database:
 
 ```bash
-mysql -u admin -p --host cafedatabase.crwxbgqad61a.us-east-1.rds.amazonaws.com < CafeDbDump.sql
+mysql -u admin -p --host cafedatabase.<rds-id>.us-east-1.rds.amazonaws.com < CafeDbDump.sql
 ```
 
 This command:
@@ -302,7 +302,7 @@ This command:
 I verified the import by connecting to RDS and checking the data:
 
 ```bash
-mysql -u admin -p --host cafedatabase.crwxbgqad61a.us-east-1.rds.amazonaws.com
+mysql -u admin -p --host cafedatabase.<rds-id>.us-east-1.rds.amazonaws.com
 ```
 
 ```sql
@@ -331,8 +331,8 @@ The café application uses AWS Secrets Manager to retrieve database connection p
 
 1. Opened Secrets Manager console
 2. Selected the `/cafe/dbUrl` secret
-3. Updated value to: `cafedatabase.crwxbgqad61a.us-east-1.rds.amazonaws.com`
-4. Updated the `/cafe/dbPassword` secret with the RDS master password: `Caf3DbPassw0rd!`
+3. Updated value to: `cafedatabase.<rds-id>.us-east-1.rds.amazonaws.com`
+4. Updated the `/cafe/dbPassword` secret with the RDS master password: `<RDS_MASTER_PASSWORD>`
 5. Updated the `/cafe/dbUser` secret to: `admin`
 6. Verified `/cafe/dbName` is set to: `cafe_db`
 

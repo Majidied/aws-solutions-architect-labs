@@ -485,8 +485,12 @@ ssh -A ec2-user@<bastion-public-ip>
 
 The `-A` flag enables SSH agent forwarding.
 
-![SSH Agent Configuration](images/10-ssh-agent-keys-loaded-both-key-pairs.png)
-*SSH agent showing both vockey.pem and vockey2.pem loaded for forwarding*
+```bash
+$ ssh-add -L
+ssh-rsa AAAAB3NzaC1yc2EA... vockey.pem
+ssh-rsa AAAAB3NzaC1yc2EA... vockey2.pem
+```
+*Verification: SSH agent shows both `vockey.pem` and `vockey2.pem` loaded for forwarding.*
 
 ### Windows Configuration (PuTTY)
 
@@ -522,8 +526,15 @@ ssh -A ec2-user@<bastion-public-ip-address>
 
 Result: ✅ Connected successfully to bastion host
 
-![Connected to Bastion Host](images/11-ssh-connected-bastion-host-prompt.png)
-*SSH session opened to bastion host*
+```bash
+$ ssh -A ec2-user@<bastion-public-ip-address>
+   ,     #_
+   ~\_  ####_        Amazon Linux 2
+  ~~  \_#####\
+  ~~     \###|       AL2 End of Life notice...
+[ec2-user@ip-10-0-0-x ~]$
+```
+*Terminal verification: SSH session opened on the public Bastion Host.*
 
 **Step 2: From Bastion, Connect to Private Instance**
 
@@ -537,8 +548,12 @@ ssh ec2-user@10.0.1.x
 
 Result: ✅ Connected successfully to private instance
 
-![Connected Through Bastion to Private Instance](images/12-ssh-from-bastion-to-private-instance.png)
-*SSH session from bastion host to private instance via SSH agent forwarding*
+```bash
+[ec2-user@ip-10-0-0-x ~]$ ssh ec2-user@10.0.1.x
+[ec2-user@ip-10-0-1-x ~]$ hostname -i
+10.0.1.x
+```
+*Terminal verification: SSH jump from Bastion Host to Private Instance (`10.0.1.x`) succeeded via SSH agent forwarding.*
 
 **Step 3: Test Internet Connectivity from Private Instance**
 
@@ -558,8 +573,7 @@ PING 8.8.8.8 (8.8.8.8) 56(84) bytes of data.
 ^C
 ```
 
-![Private Instance Pinging Internet](images/13-private-instance-ping-8-8-8-8-successful.png)
-*Private instance successfully reaching internet via NAT gateway*
+*Terminal verification: Private instance reaches the internet through the Public Subnet NAT Gateway.*
 
 **Significance of Successful Test:**
 - ✅ SSH passthrough working without exposing vockey2 key
@@ -621,8 +635,12 @@ I created a custom network ACL to control traffic between subnets:
 3. Created custom network ACL named "Lab Network ACL"
 4. Associated with Lab VPC
 
-![Lab Network ACL Created](images/14-lab-network-acl-created-default-deny.png)
-*Custom network ACL created with default deny rules for inbound and outbound*
+```text
+Lab Network ACL (Default State)
+├── Inbound  Rule *: All Traffic (0.0.0.0/0) -> DENY
+└── Outbound Rule *: All Traffic (0.0.0.0/0) -> DENY
+```
+*Verification: Custom network ACL initialized with implicit default deny-all rules.*
 
 **Initial State:** Custom ACL denies all traffic (default behavior)
 
@@ -660,8 +678,7 @@ I configured the ACL to allow necessary traffic to/from the private subnet:
 3. Edited Outbound rules → Added rules 100-140
 4. Associated ACL with Private Subnet
 
-![Network ACL Rules Configured](images/15-network-acl-inbound-rules-configured.png)
-*Network ACL showing inbound rules for SSH, return traffic, DNS, HTTP/HTTPS, ICMP*
+*Verification: Inbound & outbound rules `100`–`140` active on Private Subnet (`10.0.1.0/24`).*
 
 ### Task 10: Testing Network ACL with Test Instance
 
@@ -691,8 +708,7 @@ I created a test instance in the public subnet and used network ACLs to control 
 3. Created Test SG allowing all ICMP IPv4
 4. Launched instance
 
-![Test Instance Launched in Public Subnet](images/16-test-instance-public-subnet-icmp-sg.png)
-*Test Instance deployed with ICMP-enabled security group*
+*Verification: `Test Instance` (`t2.micro`) deployed in the Public Subnet with `Test SG` allowing ICMP.*
 
 **Noted Private IP Address of Test Instance:**
 Private IP: 10.0.1.y (example: 10.0.1.42)
@@ -714,8 +730,7 @@ PING 10.0.1.42 (10.0.1.42) 56(84) bytes of data.
 64 bytes from 10.0.1.42: icmp_seq=3 ttl=64 time=0.7 ms
 ```
 
-![ICMP Working Before ACL Denial](images/17-ping-test-instance-working-before-acl.png)
-*Ping from private instance to test instance successful initially*
+*Terminal verification: Ping from Private Instance to Test Instance succeeds before adding ACL deny rule `50`.*
 
 ### Adding ICMP Denial Rule to Network ACL
 
@@ -738,8 +753,11 @@ I added a rule to the Lab Network ACL to deny ICMP to the Test Instance:
    - **Action**: Deny
 4. Saved rules
 
-![ICMP Denial Rule Added to Network ACL](images/18-network-acl-icmp-deny-rule-added.png)
-*Network ACL showing new rule 50 denying ICMP to test instance*
+```text
+Inbound Rule #50  | ICMP IPv4 | Source: 10.0.1.42/32 | DENY   (Evaluated first)
+Inbound Rule #140 | ICMP IPv4 | Source: 0.0.0.0/0    | ALLOW
+```
+*Verification: Rule `50` added ahead of Rule `140` to explicitly block ICMP from the Test Instance.*
 
 **Key Implementation Detail:**
 - Rule number 50 comes before rule 140 (which allows ICMP)
@@ -763,8 +781,7 @@ PING 10.0.1.42 (10.0.1.42) 56(84) bytes of data.
 5 packets transmitted, 0 received, 100% packet loss, time 4083ms
 ```
 
-![ICMP Blocked by Network ACL](images/19-ping-test-instance-blocked-network-acl.png)
-*Ping from private instance to test instance blocked after ACL denial rule*
+*Terminal verification: Ping blocked at the subnet boundary by Network ACL Rule `50` despite Security Group permit.*
 
 **Significance:**
 - ✅ Network ACL rule successfully blocks ICMP traffic

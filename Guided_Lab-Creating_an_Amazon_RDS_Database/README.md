@@ -130,14 +130,14 @@ I configured the web application to communicate with the newly created RDS datab
 1. Navigated to RDS Console → Databases
 2. Selected the "inventory-db" instance
 3. Located the **Connectivity & Security** section
-4. Copied the **Endpoint**: `inventory-db.crwxbgqad61a.rds.amazonaws.com`
+4. Copied the **Endpoint**: `inventory-db.<rds-id>.rds.amazonaws.com`
 
 #### Step 2: Application Configuration
 I accessed the web application settings and entered the following connection parameters:
 
 | Parameter | Value | Source |
 |-----------|-------|--------|
-| Endpoint | inventory-db.crwxbgqad61a.rds.amazonaws.com | RDS Console |
+| Endpoint | inventory-db.<rds-id>.rds.amazonaws.com | RDS Console |
 | Database | inventory | RDS initial database name |
 | Username | admin | RDS master username |
 | Password | lab-password | RDS master password |
@@ -380,7 +380,7 @@ RDS MySQL Database (private subnets, multi-AZ capable)
 
 1. **RDS Database Instance**: `inventory-db`
    - MySQL 8.0.x (latest stable)
-   - Endpoint: `inventory-db.crwxbgqad61a.rds.amazonaws.com`
+   - Endpoint: `inventory-db.<rds-id>.rds.amazonaws.com`
    - Database: `inventory`
    - Status: Available
 

@@ -1,8 +1,12 @@
 # AWS Solutions Architect — Capstone Project & Labs Portfolio
 
 [![AWS](https://img.shields.io/badge/AWS-Solutions%20Architect%20Associate-FF9900?logo=amazon-aws&logoColor=white)](https://aws.amazon.com/certification/certified-solutions-architect-associate/)
+[![VPC](https://img.shields.io/badge/AWS-VPC%20%26%20Networking-8C4FFF?logo=amazon-aws&logoColor=white)](./Challenge_Lab-Creating_a_VPC_Networking_Environment_for_the_Cafe/)
+[![RDS](https://img.shields.io/badge/Amazon-RDS%20MySQL-527FFF?logo=amazon-rds&logoColor=white)](./Challenge_Cafe-Migrating_a_Database_to_Amazon_RDS/)
+[![Secrets Manager](https://img.shields.io/badge/AWS-Secrets%20Manager-DD344C?logo=amazon-aws&logoColor=white)](./Challenge_Cafe-Creating_a_Dynamic-Website-for-the-Cafe/)
 [![Architecture](https://img.shields.io/badge/Architecture-Multi--Tier%20Secure-0073BB)](#-featured-capstone-project-secure-multi-tier-café-solution)
 [![Status](https://img.shields.io/badge/Status-Completed-success)](#-completed-labs--modules)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 A production-grade AWS Cloud Architecture portfolio and graduation capstone project demonstrating end-to-end implementation of secure, resilient, and high-performance cloud solutions aligned with the **AWS Well-Architected Framework**.
 
@@ -17,6 +21,17 @@ This capstone project combines and unifies core enterprise cloud patterns into a
 ### 📐 Solution Architecture Diagram
 
 ![AWS Solution Architecture Diagram](./images/architecture-solution-diagram.svg)
+
+### 🔀 Network Traffic & Secrets Flow
+
+```mermaid
+flowchart LR
+    User["User / Admin Browser & SSH"] --> IGW["Internet Gateway (IGW)"]
+    IGW --> Public["Public Tier (10.0.0.0/24)<br/>Bastion Host & NAT Gateway"]
+    Public --> App["Private App Subnet (10.0.1.0/24)<br/>EC2 Web Server (LAMP / PHP)"]
+    App --> RDS["Private RDS Subnet (10.0.2.0/24)<br/>Amazon RDS MySQL (3306)"]
+    App -. "IAM Role + KMS API" .-> SM["AWS Secrets Manager<br/>/cafe/dbUrl, dbName, dbUser, dbPassword"]
+```
 
 ---
 
@@ -108,3 +123,36 @@ This capstone project is documented across three primary implementation modules:
 - **Program**: AWS Solutions Architect Associate (SAA) Training & Hands-On Challenge Labs
 - **Standard**: AWS Well-Architected Framework
 - **Deliverables**: Solution Architecture Diagram + GitHub Repository Documentation
+
+---
+
+## ⚙️ Prerequisites & Configuration Contract
+
+### Prerequisites
+- An active AWS Account with permissions for **VPC, EC2, RDS, EFS, IAM, and Secrets Manager**
+- **AWS CLI v2** configured (`aws configure`) for `us-east-1` (primary) and `us-west-2` (DR/AMI replication)
+- SSH client with `ssh-agent` forwarding (`ssh -A`) for Bastion Host access to private subnet instances
+
+### AWS Secrets Manager Parameters (Café App)
+
+| Parameter / Secret Key | Purpose | Example / Format |
+| :--- | :--- | :--- |
+| `/cafe/dbUrl` | Amazon RDS MySQL endpoint | `<rds-endpoint>.rds.amazonaws.com` |
+| `/cafe/dbName` | Application database name | `cafe_db` |
+| `/cafe/dbUser` | Database username | `admin` |
+| `/cafe/dbPassword` | Database master password | Encrypted in Secrets Manager (KMS) |
+
+---
+
+## 🗺️ Project Status & Roadmap
+
+- **Current Status:** **Completed** — All 7 AWS Solutions Architect guided & challenge labs implemented, verified, and documented with architecture diagrams, terminal proofs, and console captures.
+- **Planned Enhancements:**
+  - [ ] Codify the Multi-Tier Café VPC + EC2 + RDS architecture using **Terraform** (`infra/`)
+  - [ ] Add an **Application Load Balancer (ALB)** and **Auto Scaling Group (ASG)** in front of the private web tier
+
+---
+
+## 📄 License
+
+This repository is licensed under the [MIT License](LICENSE).
